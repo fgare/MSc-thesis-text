@@ -1,0 +1,66 @@
+\documentclass[a4paper,oneside,12pt]{book}
+
+\newcommand{\titolo}{Titolo della tesi} %
+\newcommand{\autore}{nome cognome} % 
+\newcommand{\matricola}{000007} % 
+\newcommand{\relatore}{Prof. Alain Turing} % 
+\newcommand{\correlatore}{Prof. Robin Gandy} % 
+\newcommand{\school}{Corso di Laurea in Informatica}  %
+\newcommand{\annoacc}{2024-25}  %
+
+%% Language and font encodings
+\usepackage[T1]{fontenc} 
+\usepackage[utf8]{inputenc}
+%\usepackage[english]{babel}  % se tesi in inglese
+\usepackage[italian]{babel}
+\usepackage{setspace}
+
+%% Bibliographical stuff
+\usepackage[round,sort,comma,numbers]{natbib}
+
+%% Document size
+\usepackage[a4paper,top=2.56cm,bottom=2.56cm,left=2.56cm,right=2.56cm, head = 16pt]{geometry}
+\setlength{\marginparwidth}{2cm}
+
+%% Useful packages
+\usepackage{amsmath}
+\usepackage[pdftex]{graphicx}
+\usepackage[textsize=footnotesize]{todonotes}
+\usepackage[colorlinks=true, allcolors=black]{hyperref}
+\usepackage{xcolor}
+\usepackage{caption}  % if no caption, no colon
+\usepackage{mathpazo} % Use Palatino font instead of Computer Modern
+
+%% frontmatter
+\pagestyle{plain}
+\title{\thesistitle}
+\author{\authorname}
+
+\frontmatter
+
+%% Begin document
+\begin{document}
+
+\input{config/title.tex}
+
+%% Eventuali ringraziamenti
+\section*{Ringraziamenti}
+Questa sezione è facoltativa.
+\newpage 
+
+%% indice
+\linespread{3.5}
+\onehalfspacing
+\tableofcontents
+\newpage
+
+%% Capitoli della tesi contenuti in file distinti
+\mainmatter
+\input{cap1-intro.tex}
+\input{cap2-modello.tex}
+\input{cap3-results.tex}
+
+%% sezione bibliografia
+\bibliographystyle{unsrtnat}
+\bibliography{tesi}
+\end{document}
