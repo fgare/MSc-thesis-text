@@ -1,23 +1,45 @@
 \chapter{Introduzione}
 
 
-Nella stesura  della tesi, in quasi tutti i casi tre parti devono emergere con chiarezza:
-\begin{itemize}
-	\item analisi dello stato dell’arte e definizione del problema
-	\item studio e/o sviluppo di modelli per la risoluzione del problema
-	\item risultati teorici o sperimentali ottenuti
-\end{itemize} 
+% Nella stesura  della tesi, in quasi tutti i casi tre parti devono emergere con chiarezza:
+% \begin{itemize}
+% 	\item analisi dello stato dell’arte e definizione del problema
+% 	\item studio e/o sviluppo di modelli per la risoluzione del problema
+% 	\item risultati teorici o sperimentali ottenuti
+% \end{itemize} 
 
 
 
-La scelta di come strutturare l'elaborato finale non è univoca, pertanto si suggerisce di iniziare creando un indice organizzato in maniera gerarchica suddiviso in capitoli, sezioni, sottosezioni (non eccedere con la profondità, si rischia di frammentare troppo il testo).
+% La scelta di come strutturare l'elaborato finale non è univoca, pertanto si suggerisce di iniziare creando un indice organizzato in maniera gerarchica suddiviso in capitoli, sezioni, sottosezioni (non eccedere con la profondità, si rischia di frammentare troppo il testo).
 
-Un esempio di 'albero' che prevede annidamenti fino alle sottosezioni è il seguente (puramente indicativo):
+% Un esempio di 'albero' che prevede annidamenti fino alle sottosezioni è il seguente (puramente indicativo):
 
 \section{Il problema affrontato}
-	\subsection{subsection a}
-	\subsection{subsection b}
-	
+
+La ricostruzione tridimensionale della forma e della posa delle mani a partire da input visivi rappresenta una delle sfide più complesse e attuali nell'ambito della Computer Vision.
+Poiché le interazioni umane con l'ambiente circostante avvengono prevalentemente in uno spazio tridimensionale, la capacità di catturare fedelmente tali movimenti risulta cruciale.
+Le mani e il corpo operano in sinergia per comunicare e risolvere compiti complessi; pertanto, una comprensione completa delle azioni, delle emozioni e delle intenzioni umane non è possibile senza un'analisi congiunta di entrambi. 
+Sorprendentemente, la modellazione 3D e il tracciamento del corpo e delle mani sono stati storicamente affrontati nella ricerca come due domini separati.
+
+Dal punto di vista tecnico, il problema dell'inferenza della posa e della ricostruzione della mesh delle mani è intrinsecamente difficile a causa di molteplici fattori. 
+In primo luogo, vi è una problematica legata alla scala e alla risoluzione: nelle immagini o nelle scansioni 3D a corpo intero, le mani occupano una porzione minima dello spazio visivo o del volume di acquisizione. 
+Questo le rende spesso parzialmente occluse e difficili da risolvere in modo completo, limitando la precisione dei dati in ingresso.
+
+A questo ostacolo si aggiunge la notevole destrezza della mano umana, che costituisce un sistema articolato con un elevato numero di gradi di libertà. 
+Il tracciamento visivo è ulteriormente complicato dalla forte somiglianza strutturale e cromatica tra le singole dita, che rende difficile l'estrazione di feature distintive. 
+Inoltre, la cinematica tipica delle mani è caratterizzata da movimenti estremamente rapidi; ciò genera frequenti fenomeni di \emph{motion blur} (sfocatura da movimento) nelle acquisizioni, degradando la qualità dell'immagine.
+
+Un'ulteriore sfida critica è dettata dalla topologia e dall'utilizzo stesso della mano. 
+La sua complessa geometria 3D, unita all'interazione continua con gli oggetti, causa costanti auto-occlusioni e occlusioni esterne. 
+Questa carenza di informazioni visive rende l'inferenza della posa un problema altamente ambiguo.
+
+Infine, le limitazioni dell'hardware di acquisizione aggravano queste ambiguità. 
+Nell'utilizzo di scanner 3D a corpo intero, la risoluzione insufficiente per i dettagli fini genera misurazioni rumorose o dati mancanti, che spesso portano alla totale scomparsa della mano dalla scansione o alla creazione di artefatti visivi, come la fusione non realistica dei vertici tra le dita (effetto "webbing"). 
+Risolvere il problema della ricostruzione della mesh delle mani richiede quindi approcci in grado di gestire questi elevati livelli di rumore, sfruttando prior geometrici robusti per inferire l'articolazione in presenza di incertezza.
+
+% integrare dai seguenti paper:
+% - hands_flat.pdf
+% - Vision-based hand pose estimation A review.pdf
 	
 \section{Stato dell'arte}
 \subsection{subsection c}
