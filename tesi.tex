@@ -1,12 +1,12 @@
 \documentclass[a4paper,oneside,12pt]{book}
 
 \newcommand{\titolo}{Titolo della tesi} %
-\newcommand{\autore}{nome cognome} % 
+\newcommand{\autore}{Federico Garegnani} % 
 \newcommand{\matricola}{000007} % 
-\newcommand{\relatore}{Prof. Alain Turing} % 
-\newcommand{\correlatore}{Prof. Robin Gandy} % 
+\newcommand{\relatore}{Prof. Grossi} % 
+\newcommand{\correlatore}{Prof. Francesco Agnelli} % 
 \newcommand{\school}{Corso di Laurea in Informatica}  %
-\newcommand{\annoacc}{2024-25}  %
+\newcommand{\annoacc}{2025-26}  %
 
 %% Language and font encodings
 \usepackage[T1]{fontenc} 
@@ -16,7 +16,7 @@
 \usepackage{setspace}
 
 %% Bibliographical stuff
-\usepackage[round,sort,comma,numbers]{natbib}
+\usepackage[square,sort,comma,numbers]{natbib}
 
 %% Document size
 \usepackage[a4paper,top=2.56cm,bottom=2.56cm,left=2.56cm,right=2.56cm, head = 16pt]{geometry}
@@ -61,6 +61,7 @@ Questa sezione è facoltativa.
 \input{cap3-results.tex}
 
 %% sezione bibliografia
+\nocite{*} % inserisce in biblio anche le fonti non citate nel testo
 \bibliographystyle{unsrtnat}
 \bibliography{tesi}
 \end{document}
