@@ -21,25 +21,38 @@ Le mani e il corpo operano in sinergia per comunicare e risolvere compiti comple
 Il tracciamento del movimento delle mani trova molteplici applicazioni nell'ambito dell'interazione uomo-macchina (Human-Computer Interaction, HCI) per lo sviluppo di interfacce più naturali e intuitive, nonché in ambito di telemedicina, robotica ed animazione.
 
 Sorprendentemente, la modellazione 3D e il tracciamento del corpo e delle mani sono stati storicamente affrontati nella ricerca come due domini separati \cite{MANO:SIGGRAPHASIA:2017,EROL200752}.
-Dal punto di vista tecnico, il problema dell'inferenza della posa e della ricostruzione della mesh delle mani è intrinsecamente difficile a causa di molteplici fattori. 
-In primo luogo, vi è una problematica legata alla scala e alla risoluzione: nelle immagini o nelle scansioni 3D a corpo intero, le mani occupano una porzione minima dello spazio visivo o del volume di acquisizione. 
-Questo le rende spesso parzialmente occluse e difficili da risolvere in modo completo, limitando la precisione dei dati in ingresso e generando spesso rumore o l'effetto di fusione dei vertici tra le dita (\emph{webbing}).
+Dal punto di vista tecnico, il problema dell'inferenza della posa e della ricostruzione della mesh delle mani è intrinsecamente difficile a causa di molteplici fattori.
 
-A questo ostacolo si aggiunge la notevole destrezza della mano umana, che costituisce un sistema articolato con un elevato numero di gradi di libertà. 
-Il tracciamento visivo è ulteriormente complicato dalla forte somiglianza strutturale e cromatica tra le singole dita, che rende difficile l'estrazione di feature distintive. 
-Inoltre, la cinematica tipica delle mani è caratterizzata da movimenti estremamente rapidi; ciò genera frequenti fenomeni di \emph{motion blur} (sfocatura da movimento) nelle acquisizioni, degradando la qualità dell'immagine.
+\begin{itemize}
+    \item La mano umana gode di una notevole mobilità; essa costituisce infatti un sistema articolato con oltre 20 gradi di libertà (DOF: \emph{degree of freedom}).
+    Sebbene una mano reale non goda di 20 gdl completi a causa dell'interdipendenza tra dita, studi hanno mostrato come sia impossibile modellarne una con meno di 6 gdl.
+    
+    \item Nelle immagini o nelle scansioni 3D a corpo intero, le mani occupano una porzione minima dello spazio visivo o del volume di acquisizione.
+    Il tracciamento visivo è inoltre complicato dalla forte somiglianza strutturale e cromatica tra le singole dita.
+    Queste caratteristiche rendono le dita estremamente difficili da risolvere, generando spesso rumore o l'effetto di fusione dei vertici delle dita (\emph{webbing}).
+    In aggiunta a ciò, la naturale geometria delle mano insieme alla frequente interazione con oggetti causa continue occlusioni ed auto-occlusioni, rendendo l'inferenza della posa un problema altamente ambiguo.
 
-Un'ulteriore sfida critica è dettata dalla topologia e dall'utilizzo stesso della mano. 
-La sua complessa geometria 3D, unita all'interazione continua con gli oggetti, causa costanti auto-occlusioni e occlusioni esterne. 
-Questa carenza di informazioni visive rende l'inferenza della posa un problema altamente ambiguo.
+    \item La cinematica tipica delle mani è caratterizzata da movimenti estremamente rapidi, che possono raggiungere i~$5$\,m/s per le traslazioni e i~$300$\,°/s per le rotazioni del polso; ciò genera frequenti fenomeni di \emph{motion blur} (sfocatura da movimento) nelle acquisizioni, degradando la qualità dell'immagine.
 
-Infine, le limitazioni dell'hardware di acquisizione aggravano queste ambiguità. 
-Nell'utilizzo di scanner 3D a corpo intero, la risoluzione insufficiente per i dettagli fini genera misurazioni rumorose o dati mancanti, che spesso portano alla totale scomparsa della mano dalla scansione o alla creazione di artefatti visivi, come la fusione non realistica dei vertici tra le dita (effetto "webbing"). 
-Risolvere il problema della ricostruzione della mesh delle mani richiede quindi approcci in grado di gestire questi elevati livelli di rumore, sfruttando prior geometrici robusti per inferire l'articolazione in presenza di incertezza.
+    \item Anche per una singola sequenza di immagini, un sistema di computer vision deve essere in grado di elaborare un'enorme quantità di dati, spesso rispettando, al contempo, stringenti requisiti di latenza.
+    Gli algoritmi di tracciamento devono perciò essere altamente efficienti e spesso richiedono hardware specifico ottimizzato per il calcolo parallelo per l'esecuzione.
 
-% integrare dai seguenti paper:
-% - hands_flat.pdf
-% - Vision-based hand pose estimation A review.pdf
+    \item Per garantire un'ampia diffusione, il sistema deve poter operare in ambienti non controllati, con illuminazione variabile e sfondi complessi.
+    Tuttavia, segmentare un oggetto rigido in un ambiente arbitrario costituisce già di per sè un compito non banale.
+\end{itemize}
+
+Per far fronte a queste problematiche, in passato molti algoritmi per la stima della posa della mano ponevano stringenti vincoli all'utente o sull'ambiente di acquisizione.
+Ad esempio, poteva essere richiesto uno sfondo uniforme, in cui la mano fosse l'unico oggetto mobile e colorato; di evitare rapidi movimenti della mano; di mantenere il palmo parallelo al piano immagine; di campionare con una frequenza molto elevata.
+% TODO: verificare. Erol 2.1
+Questi vincoli erano volti a ridurre i gradi di libertà della mano e semplificare il problema.
+
+Per queste ragioni i metodi migliori per l'acquisizione del movimento della mano si sono basati a lungo sull'utilizzo di dispositivi elettromeccanici o magnetici da indossare, comunemente noti come \emph{data gloves}.
+Sebbene tali dispositivi forniscano misurazioni complete in tempo reale, essi presentano notevoli limitazioni pratiche, in quanto tali sensori risultano onerosi dal punto di vista economico, ostacolano la naturalezza del movimento e richiedono prolungate procedure di calibrazione e configurazione per ottenere stime precise.
+Inoltre, i sistemi di tracciamento basati sull'applicazione di marcatori (marker-based) si rivelano spesso intrusivi, in quanto i marcatori stessi possono alterare la forma della mano e limitarne l'ampiezza dei movimenti.
+È stato inoltre osservato come i marcatori possono staccarsi durante l'uso e sono anch'essi soggetti ad occlusioni, necessitando pertanto di un numero elevato di telecamere per garantire una corretta risoluzione in un volume di cattura esteso.
+
+L'approccio basato sulla visione artificiale (Computer Vision) offre il potenziale per superare tali barriere, proponendo soluzioni non a contatto, prive di ingombri fisici e conseguentemente più naturali.
+
 	
 \section{Stato dell'arte}
 \subsection{subsection c}
