@@ -17,13 +17,13 @@
 \section{Il problema affrontato}
 
 La ricostruzione tridimensionale della forma e della posa delle mani a partire da input visivi rappresenta una delle sfide più complesse e attuali nell'ambito della Computer Vision.
-Poiché le interazioni umane con l'ambiente circostante avvengono prevalentemente in uno spazio tridimensionale, la capacità di catturare fedelmente tali movimenti risulta cruciale.
-Le mani e il corpo operano in sinergia per comunicare e risolvere compiti complessi; pertanto, una comprensione completa delle azioni, delle emozioni e delle intenzioni umane non è possibile senza un'analisi congiunta di entrambi. 
-Sorprendentemente, la modellazione 3D e il tracciamento del corpo e delle mani sono stati storicamente affrontati nella ricerca come due domini separati.
+Le mani e il corpo operano in sinergia per comunicare e risolvere compiti complessi; pertanto, una comprensione completa delle azioni, delle emozioni e delle intenzioni umane non è possibile senza un'analisi congiunta di entrambi.
+Il tracciamento del movimento delle mani trova molteplici applicazioni nell'ambito dell'interazione uomo-macchina (Human-Computer Interaction, HCI) per lo sviluppo di interfacce più naturali e intuitive, nonché in ambito di telemedicina, robotica ed animazione.
 
+Sorprendentemente, la modellazione 3D e il tracciamento del corpo e delle mani sono stati storicamente affrontati nella ricerca come due domini separati \cite{MANO:SIGGRAPHASIA:2017,EROL200752}.
 Dal punto di vista tecnico, il problema dell'inferenza della posa e della ricostruzione della mesh delle mani è intrinsecamente difficile a causa di molteplici fattori. 
 In primo luogo, vi è una problematica legata alla scala e alla risoluzione: nelle immagini o nelle scansioni 3D a corpo intero, le mani occupano una porzione minima dello spazio visivo o del volume di acquisizione. 
-Questo le rende spesso parzialmente occluse e difficili da risolvere in modo completo, limitando la precisione dei dati in ingresso.
+Questo le rende spesso parzialmente occluse e difficili da risolvere in modo completo, limitando la precisione dei dati in ingresso e generando spesso rumore o l'effetto di fusione dei vertici tra le dita (\emph{webbing}).
 
 A questo ostacolo si aggiunge la notevole destrezza della mano umana, che costituisce un sistema articolato con un elevato numero di gradi di libertà. 
 Il tracciamento visivo è ulteriormente complicato dalla forte somiglianza strutturale e cromatica tra le singole dita, che rende difficile l'estrazione di feature distintive. 
