@@ -17,10 +17,20 @@
 \section{Il problema affrontato}
 
 La ricostruzione tridimensionale della forma e della posa delle mani a partire da input visivi rappresenta una delle sfide più complesse e attuali nell'ambito della Computer Vision.
-Le mani e il corpo operano in sinergia per comunicare e risolvere compiti complessi; pertanto, una comprensione completa delle azioni, delle emozioni e delle intenzioni umane non è possibile senza un'analisi congiunta di entrambi.
+Le mani e il corpo operano in costante sinergia per comunicare e risolvere compiti complessi; pertanto, una comprensione completa delle azioni, delle emozioni e delle intenzioni umane non è possibile senza un'analisi congiunta di entrambi.
 Il tracciamento del movimento delle mani trova molteplici applicazioni nell'ambito dell'interazione uomo-macchina (Human-Computer Interaction, HCI) per lo sviluppo di interfacce più naturali e intuitive, nonché in ambito di telemedicina, robotica ed animazione.
 
 Sorprendentemente, la modellazione 3D e il tracciamento del corpo e delle mani sono stati storicamente affrontati nella ricerca come due domini separati \cite{MANO:SIGGRAPHASIA:2017,EROL200752}.
+
+La stima della posa del corpo umano è stata in realtà un campo di ricerca a lungo molto più attivo.
+Questo ha portato allo sviluppo di tecniche di tracciamento che hanno poi potuto essere riutilizate negli algoritmi di tracciamento delle mani.
+
+Esistono tuttavia notevoli differenze tra i due ambienti operativi:
+per esempio, la presenza dei vestiti sul corpo aumenta la complessità di stima della posa, ma, al contempo, la presenza di colori aiuta la segmentazione e l'estrazione di caratteristiche basate su colore e texture;
+in particolare nei confronti dell'uniformità di colore delle mani.
+Un altro esmepio può essere la possibilità di stimare la posa del corpo umano parte per parte o in maniera gerarchica (per prima la testa, poi torso, gambe, etc.), così da suddividere il problema in sottoproblemi con una complessità dimensionale inferiore.
+Nel caso della mano, un approccio gerarchio rimarrebbe limitato a due sole parti: il palmo e le dita \cite{EROL200752}.
+
 Dal punto di vista tecnico, il problema dell'inferenza della posa e della ricostruzione della mesh delle mani è intrinsecamente difficile a causa di molteplici fattori.
 
 \begin{itemize}
@@ -44,22 +54,66 @@ Dal punto di vista tecnico, il problema dell'inferenza della posa e della ricost
 Per far fronte a queste problematiche, in passato molti algoritmi per la stima della posa della mano ponevano stringenti vincoli all'utente o sull'ambiente di acquisizione.
 Ad esempio, poteva essere richiesto uno sfondo uniforme, in cui la mano fosse l'unico oggetto mobile e colorato; di evitare rapidi movimenti della mano; di mantenere il palmo parallelo al piano immagine; di campionare con una frequenza molto elevata.
 % TODO: verificare. Erol 2.1
-Questi vincoli erano volti a ridurre i gradi di libertà della mano e semplificare il problema.
+Questi vincoli erano tutti volti a ridurre i gradi di libertà della mano e semplificare il problema.
 
 Per queste ragioni i metodi migliori per l'acquisizione del movimento della mano si sono basati a lungo sull'utilizzo di dispositivi elettromeccanici o magnetici da indossare, comunemente noti come \emph{data gloves}.
 Sebbene tali dispositivi forniscano misurazioni complete in tempo reale, essi presentano notevoli limitazioni pratiche, in quanto tali sensori risultano onerosi dal punto di vista economico, ostacolano la naturalezza del movimento e richiedono prolungate procedure di calibrazione e configurazione per ottenere stime precise.
 Inoltre, i sistemi di tracciamento basati sull'applicazione di marcatori (marker-based) si rivelano spesso intrusivi, in quanto i marcatori stessi possono alterare la forma della mano e limitarne l'ampiezza dei movimenti.
 È stato inoltre osservato come i marcatori possono staccarsi durante l'uso e sono anch'essi soggetti ad occlusioni, necessitando pertanto di un numero elevato di telecamere per garantire una corretta risoluzione in un volume di cattura esteso.
 
-L'approccio basato sulla visione artificiale (Computer Vision) offre il potenziale per superare tali barriere, proponendo soluzioni non a contatto, prive di ingombri fisici e conseguentemente più naturali.
+L'approccio basato sulla visione artificiale (Computer Vision) offre il potenziale per superare tali barriere, proponendo soluzioni non a contatto, prive di ingombri fisici e conseguentemente più naturali \cite{EROL200752}.
 
-	
+
+\section{Il problema della modellazione della mano}
+
+\subsection{Il modello cinematico della mano}
+
+Il modello cinematico della mano si basa sulla rappresentazione dello scheletro come un sistema di corpi rigidi interconnessi da articolazioni dotate di uno o più gradi di libertà (Degrees of Freedom, DOF) rotazionali.
+Dal punto di vista anatomico e cinematico, il modello si articola secondo le seguenti caratteristiche:
+
+\begin{itemize}
+    \item La struttura ossea è composta da 27 ossa complessive, di cui 8 localizzate nel polso e le restanti 19 strutturate a formare il palmo e le dita.
+    
+    \item Le articolazioni interfalangee (Interphalangeal, IP), che collegano i segmenti interni di ciascun dito, sono nove in totale e vengono modellate in modo accurato con un singolo grado di libertà adibito ai movimenti di flessione ed estensione.
+    
+    \item Le articolazioni metacarpo-falangee (Metacarpophalangeal, MCP), responsabili dell'unione tra le dita e il palmo, sono tipicamente descritte in letteratura come giunti a sella con due gradi di libertà.
+    Tali gradi consentono i movimenti di flessione ed estensione, nonché l'abduzione e l'adduzione (l'allontanamento reciproco delle dita) sul piano definito dal palmo.
+    
+    \item Le articolazioni carpo-metacarpali (Carpometacarpal, CMC) collegano le ossa metacarpali al polso.
+    Le articolazioni CMC del dito indice e del dito medio sono considerate statiche. 
+    Sebbene le articolazioni CMC dell'anulare e del mignolo possiedano una mobilità limitata associata alla curvatura del palmo, tale movimento è frequentemente trascurato, portando all'assunzione di un palmo completamente rigido.
+    
+    \item L'articolazione CMC del pollice, denominata trapeziometacarpale (TM), rappresenta il giunto di più complessa modellazione, in quanto dotata di due assi di rotazione non ortogonali e non secanti. 
+    Il modello a sella con due gradi di libertà risulta limitante per questo giunto; per superare tale restrizione è stata proposta in alcuni studi l'estensione a un giunto sferico con tre gradi di libertà.
+\end{itemize}
+
+La combinazione dei gradi di libertà angolari delle dita, definita \emph{configurazione locale}, e dei sei gradi di libertà associati a un sistema di riferimento posizionato nel polso, definita \emph{configurazione globale}, costituisce il vettore di configurazione che rappresenta la posa completa della mano.
+
+Un modello cinematico standard e ampiamente utilizzato nella ricerca prevede complessivamente 27 gradi di libertà. 
+In questo modello, assumendo le articolazioni CMC come fisse, il palmo viene modellato in maniera non del tutto realistica come un unico corpo rigido. 
+Le dita sono invece schematizzate come catene cinematiche seriali planari, agganciate al palmo mediante punti di ancoraggio coincidenti con le articolazioni MCP.
+
+Poiché l'assunzione di planarità per il movimento delle dita non è generalmente valida nella realtà, sono state introdotte diverse varianti per affinare il modello cinematico.
+Tra le soluzioni adottate figurano:
+
+\begin{itemize}
+    \item L'aggiunta di un movimento di torsione supplementare alle articolazioni MCP.
+    \item L'inserimento di un movimento di torsione attorno all'asse osseo come funzione lineare degli angoli di abduzione e flessione.
+    \item L'introduzione di un grado di libertà per la flessione e l'estensione nelle articolazioni CMC.
+    \item L'impiego di giunti sferici dedicati specificamente all'articolazione TM del pollice.
+\end{itemize}
+
+% inserire immagine con RX mano dal paper e generare schema della struttura
+
+% sec 3 del paper di Erol
+
+
 \section{Stato dell'arte}
-\subsection{subsection c}
-\subsection{subsection d}
+
+% TODO inserire sec 2.2 taxonomy dal paper di Erol
+% parlo dei modelli già esistenti: MANO, SMPL, Hamer
+
+
+
 
 \section{Soluzioni in letteratura}
-
-\subsection{subsection e}
-\subsection{subsection f}
-\subsection{subsection g}

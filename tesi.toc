@@ -2,17 +2,14 @@
 \babel@toc {italian}{}\relax 
 \contentsline {chapter}{\numberline {1}Introduzione}{1}{chapter.1}%
 \contentsline {section}{\numberline {1.1}Il problema affrontato}{1}{section.1.1}%
-\contentsline {section}{\numberline {1.2}Stato dell'arte}{3}{section.1.2}%
-\contentsline {subsection}{\numberline {1.2.1}subsection c}{3}{subsection.1.2.1}%
-\contentsline {subsection}{\numberline {1.2.2}subsection d}{3}{subsection.1.2.2}%
-\contentsline {section}{\numberline {1.3}Soluzioni in letteratura}{3}{section.1.3}%
-\contentsline {subsection}{\numberline {1.3.1}subsection e}{3}{subsection.1.3.1}%
-\contentsline {subsection}{\numberline {1.3.2}subsection f}{3}{subsection.1.3.2}%
-\contentsline {subsection}{\numberline {1.3.3}subsection g}{3}{subsection.1.3.3}%
-\contentsline {chapter}{\numberline {2}Modello studiato}{4}{chapter.2}%
-\contentsline {section}{\numberline {2.1}Figures and Tables}{4}{section.2.1}%
-\contentsline {subsection}{\numberline {2.1.1}Figures}{4}{subsection.2.1.1}%
-\contentsline {subsection}{\numberline {2.1.2}Tables}{4}{subsection.2.1.2}%
-\contentsline {subsection}{\numberline {2.1.3}Equations}{6}{subsection.2.1.3}%
-\contentsline {section}{\numberline {2.2}Referencing published work}{6}{section.2.2}%
-\contentsline {chapter}{\numberline {3}Risultati Sperimentali}{8}{chapter.3}%
+\contentsline {section}{\numberline {1.2}Il problema della modellazione della mano}{3}{section.1.2}%
+\contentsline {subsection}{\numberline {1.2.1}Il modello cinematico della mano}{3}{subsection.1.2.1}%
+\contentsline {section}{\numberline {1.3}Stato dell'arte}{4}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Soluzioni in letteratura}{4}{section.1.4}%
+\contentsline {chapter}{\numberline {2}Modello studiato}{5}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Figures and Tables}{5}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Figures}{5}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}Tables}{5}{subsection.2.1.2}%
+\contentsline {subsection}{\numberline {2.1.3}Equations}{7}{subsection.2.1.3}%
+\contentsline {section}{\numberline {2.2}Referencing published work}{7}{section.2.2}%
+\contentsline {chapter}{\numberline {3}Risultati Sperimentali}{9}{chapter.3}%
