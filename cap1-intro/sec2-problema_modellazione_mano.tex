@@ -1,0 +1,65 @@
+\section{Il problema della modellazione della mano}
+
+
+\subsection{Il modello cinematico della mano}
+
+Il modello cinematico della mano si basa sulla rappresentazione dello scheletro come un sistema di corpi rigidi interconnessi da articolazioni dotate di uno o più gradi di libertà (Degrees of Freedom, DOF) rotazionali.
+Dal punto di vista anatomico e cinematico, il modello si articola secondo le seguenti caratteristiche:
+
+\begin{itemize}
+    \item La struttura ossea è composta da 27 ossa complessive, di cui 8 localizzate nel polso e le restanti 19 strutturate a formare il palmo e le dita.
+    
+    \item Le articolazioni interfalangee (Interphalangeal, IP), che collegano i segmenti interni di ciascun dito, sono nove in totale e vengono modellate in modo accurato con un singolo grado di libertà adibito ai movimenti di flessione ed estensione.
+    
+    \item Le articolazioni metacarpo-falangee (Metacarpophalangeal, MCP), responsabili dell'unione tra le dita e il palmo, sono tipicamente descritte in letteratura come giunti a sella con due gradi di libertà.
+    Tali gradi consentono i movimenti di flessione ed estensione, nonché l'abduzione e l'adduzione (l'allontanamento reciproco delle dita) sul piano definito dal palmo.
+    
+    \item Le articolazioni carpo-metacarpali (Carpometacarpal, CMC) collegano le ossa metacarpali al polso.
+    Le articolazioni CMC del dito indice e del dito medio sono considerate statiche. 
+    Sebbene le articolazioni CMC dell'anulare e del mignolo possiedano una mobilità limitata associata alla curvatura del palmo, tale movimento è frequentemente trascurato, portando all'assunzione di un palmo completamente rigido.
+    
+    \item L'articolazione CMC del pollice, denominata trapeziometacarpale (TM), rappresenta il giunto di più complessa modellazione, in quanto dotata di due assi di rotazione non ortogonali e non secanti. 
+    Il modello a sella con due gradi di libertà risulta limitante per questo giunto; per superare tale restrizione è stata proposta in alcuni studi l'estensione a un giunto sferico con tre gradi di libertà.
+\end{itemize}
+
+La combinazione dei gradi di libertà angolari delle dita, definita \emph{configurazione locale}, e dei sei gradi di libertà associati a un sistema di riferimento posizionato nel polso, definita \emph{configurazione globale}, costituisce il vettore di configurazione che rappresenta la posa completa della mano.
+
+Un modello cinematico standard e ampiamente utilizzato nella ricerca prevede complessivamente 27 gradi di libertà. 
+In questo modello, assumendo le articolazioni CMC come fisse, il palmo viene modellato in maniera non del tutto realistica come un unico corpo rigido. 
+Le dita sono invece schematizzate come catene cinematiche seriali planari, agganciate al palmo mediante punti di ancoraggio coincidenti con le articolazioni MCP.
+
+Poiché l'assunzione di planarità per il movimento delle dita non è generalmente valida nella realtà, sono state introdotte diverse varianti per affinare il modello cinematico.
+Tra le soluzioni adottate figurano:
+
+\begin{itemize}
+    \item L'aggiunta di un movimento di torsione supplementare alle articolazioni MCP.
+    \item L'inserimento di un movimento di torsione attorno all'asse osseo come funzione lineare degli angoli di abduzione e flessione.
+    \item L'introduzione di un grado di libertà per la flessione e l'estensione nelle articolazioni CMC.
+    \item L'impiego di giunti sferici dedicati specificamente all'articolazione TM del pollice.
+\end{itemize}
+
+% inserire immagine con RX mano dal paper e generare schema della struttura
+
+
+\subsection{La modellazione del movimento naturale}
+
+Sebbene la mano sia in grado di assumere innumerevoli conformazioni, il movimento attivo risulta in realtà fortemente vincolato dalla biologia.
+Vincoli che non sono riprodotti dal modello cinematico.
+Pertanto, affinchè gli algoritmi di stima operino in modo efficiente ed evitino configurazioni impossibili, è indispensabile introdurre dei vincoli che circoscrivano lo spazio di ricerca alle sole pose fisiologicamente plausibili.
+
+Un primo approccio alla risoluzione di tale problematica prevede la definizione di vincoli analitici derivati dagli studi sulla biomeccanica.
+Tali formulazioni si suddividono in vincoli\emph{statici}, che modellano l'escursione di ogni parametro, e \emph{dinamici}, i quali modellano le dipendenze meccaniche tra giunti adiacenti.
+Un classico esempio è il vincolo esistente tra le articolazioni distale e prossimale, espresso dalla relazione $\theta_{DIP} = \frac{2}{3}\theta_{PIP}$.
+
+Tuttavia, l'articolata struttura della mano insieme alle complesse interazioni anatomiche impediscono di esprimere tutti i vincoli in forma chiusa.
+Per far fronte a queste complessità gli studi si sono spostati verso approcci basati sull'apprendimento automtico, sfruttando dati \emph{ground truth} acquisiti tramite sensori indossabili come i data gloves.
+L'assunto fondamentale di questi approcci è che le pose cinematicamente realizzabili risiedano in una varietà topologica (manifold) a dimensionalità notevolmente inferiore rispetto allo spazio di partenza.
+Applicando tecniche di riduzione dimensionale, come l'Analisi delle Componenti Principali (PCA) su dati articolari, è stato possibile approssimare la posa della mano in uno spazio a sette dimensioni \cite{lin2000modeling}.
+In alternativa, i dati campionati possono essere impiegati in forma diretta per generare ampi database di template sintetici, utili in fase di tracciamento per ricnoscere la mano in tutte le pose.
+
+Infine, una corretta modellazione del movimento naturale richiede non solo la restrizione spaziale delle pose ammissibili, ma anche l'apprendimento della dinamica temporale del moto. Per modellare le complesse dinamiche non lineari, sono stati proposti metodi basati sull'analisi dinamica agli autovalori (eigen-dynamic analysis, EDA).
+Tali metodi impiegano inizialmente la PCA per la riduzione dimensionale e, successivamente, modellano i movimenti indipendenti delle dita tramite sistemi lineari di basso ordine, combinandoli infine in un sistema dinamico lineare stocastico di ordine superiore.Metodologie alternative prevedono la schematizzazione dello spazio delle configurazioni sotto forma di albero di ricerca, costruito mediante tecniche di clustering gerarchico o partizionamento dell'autospazio. 
+
+
+\subsection{Modellazione della forma}
+

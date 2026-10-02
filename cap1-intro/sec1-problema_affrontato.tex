@@ -1,19 +1,3 @@
-\chapter{Introduzione}
-
-
-% Nella stesura  della tesi, in quasi tutti i casi tre parti devono emergere con chiarezza:
-% \begin{itemize}
-% 	\item analisi dello stato dell’arte e definizione del problema
-% 	\item studio e/o sviluppo di modelli per la risoluzione del problema
-% 	\item risultati teorici o sperimentali ottenuti
-% \end{itemize} 
-
-
-
-% La scelta di come strutturare l'elaborato finale non è univoca, pertanto si suggerisce di iniziare creando un indice organizzato in maniera gerarchica suddiviso in capitoli, sezioni, sottosezioni (non eccedere con la profondità, si rischia di frammentare troppo il testo).
-
-% Un esempio di 'albero' che prevede annidamenti fino alle sottosezioni è il seguente (puramente indicativo):
-
 \section{Il problema affrontato}
 
 La ricostruzione tridimensionale della forma e della posa delle mani a partire da input visivi rappresenta una delle sfide più complesse e attuali nell'ambito della Computer Vision.
@@ -62,58 +46,3 @@ Inoltre, i sistemi di tracciamento basati sull'applicazione di marcatori (marker
 È stato inoltre osservato come i marcatori possono staccarsi durante l'uso e sono anch'essi soggetti ad occlusioni, necessitando pertanto di un numero elevato di telecamere per garantire una corretta risoluzione in un volume di cattura esteso.
 
 L'approccio basato sulla visione artificiale (Computer Vision) offre il potenziale per superare tali barriere, proponendo soluzioni non a contatto, prive di ingombri fisici e conseguentemente più naturali \cite{EROL200752}.
-
-
-\section{Il problema della modellazione della mano}
-
-\subsection{Il modello cinematico della mano}
-
-Il modello cinematico della mano si basa sulla rappresentazione dello scheletro come un sistema di corpi rigidi interconnessi da articolazioni dotate di uno o più gradi di libertà (Degrees of Freedom, DOF) rotazionali.
-Dal punto di vista anatomico e cinematico, il modello si articola secondo le seguenti caratteristiche:
-
-\begin{itemize}
-    \item La struttura ossea è composta da 27 ossa complessive, di cui 8 localizzate nel polso e le restanti 19 strutturate a formare il palmo e le dita.
-    
-    \item Le articolazioni interfalangee (Interphalangeal, IP), che collegano i segmenti interni di ciascun dito, sono nove in totale e vengono modellate in modo accurato con un singolo grado di libertà adibito ai movimenti di flessione ed estensione.
-    
-    \item Le articolazioni metacarpo-falangee (Metacarpophalangeal, MCP), responsabili dell'unione tra le dita e il palmo, sono tipicamente descritte in letteratura come giunti a sella con due gradi di libertà.
-    Tali gradi consentono i movimenti di flessione ed estensione, nonché l'abduzione e l'adduzione (l'allontanamento reciproco delle dita) sul piano definito dal palmo.
-    
-    \item Le articolazioni carpo-metacarpali (Carpometacarpal, CMC) collegano le ossa metacarpali al polso.
-    Le articolazioni CMC del dito indice e del dito medio sono considerate statiche. 
-    Sebbene le articolazioni CMC dell'anulare e del mignolo possiedano una mobilità limitata associata alla curvatura del palmo, tale movimento è frequentemente trascurato, portando all'assunzione di un palmo completamente rigido.
-    
-    \item L'articolazione CMC del pollice, denominata trapeziometacarpale (TM), rappresenta il giunto di più complessa modellazione, in quanto dotata di due assi di rotazione non ortogonali e non secanti. 
-    Il modello a sella con due gradi di libertà risulta limitante per questo giunto; per superare tale restrizione è stata proposta in alcuni studi l'estensione a un giunto sferico con tre gradi di libertà.
-\end{itemize}
-
-La combinazione dei gradi di libertà angolari delle dita, definita \emph{configurazione locale}, e dei sei gradi di libertà associati a un sistema di riferimento posizionato nel polso, definita \emph{configurazione globale}, costituisce il vettore di configurazione che rappresenta la posa completa della mano.
-
-Un modello cinematico standard e ampiamente utilizzato nella ricerca prevede complessivamente 27 gradi di libertà. 
-In questo modello, assumendo le articolazioni CMC come fisse, il palmo viene modellato in maniera non del tutto realistica come un unico corpo rigido. 
-Le dita sono invece schematizzate come catene cinematiche seriali planari, agganciate al palmo mediante punti di ancoraggio coincidenti con le articolazioni MCP.
-
-Poiché l'assunzione di planarità per il movimento delle dita non è generalmente valida nella realtà, sono state introdotte diverse varianti per affinare il modello cinematico.
-Tra le soluzioni adottate figurano:
-
-\begin{itemize}
-    \item L'aggiunta di un movimento di torsione supplementare alle articolazioni MCP.
-    \item L'inserimento di un movimento di torsione attorno all'asse osseo come funzione lineare degli angoli di abduzione e flessione.
-    \item L'introduzione di un grado di libertà per la flessione e l'estensione nelle articolazioni CMC.
-    \item L'impiego di giunti sferici dedicati specificamente all'articolazione TM del pollice.
-\end{itemize}
-
-% inserire immagine con RX mano dal paper e generare schema della struttura
-
-% sec 3 del paper di Erol
-
-
-\section{Stato dell'arte}
-
-% TODO inserire sec 2.2 taxonomy dal paper di Erol
-% parlo dei modelli già esistenti: MANO, SMPL, Hamer
-
-
-
-
-\section{Soluzioni in letteratura}
