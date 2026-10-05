@@ -1,7 +1,7 @@
 \section{Il problema della modellazione della mano}
 
 
-\subsection{Il modello cinematico della mano}
+\subsection{Il modello cinematico}
 
 Il modello cinematico della mano si basa sulla rappresentazione dello scheletro come un sistema di corpi rigidi interconnessi da articolazioni dotate di uno o più gradi di libertà (Degrees of Freedom, DOF) rotazionali.
 Dal punto di vista anatomico e cinematico, il modello si articola secondo le seguenti caratteristiche:
@@ -38,7 +38,14 @@ Tra le soluzioni adottate figurano:
     \item L'impiego di giunti sferici dedicati specificamente all'articolazione TM del pollice.
 \end{itemize}
 
-% inserire immagine con RX mano dal paper e generare schema della struttura
+\begin{figure}[tbp]
+    \centering
+    \includegraphics[width=0.4\textwidth]{images/hand_x_rays.jpg}
+    \caption{Anatomia della mano}
+    \label{fig:hand_x_rays}
+\end{figure}
+
+% inserire immagine con schema della struttura della mano
 
 
 \subsection{La modellazione del movimento naturale}
@@ -57,9 +64,81 @@ L'assunto fondamentale di questi approcci è che le pose cinematicamente realizz
 Applicando tecniche di riduzione dimensionale, come l'Analisi delle Componenti Principali (PCA) su dati articolari, è stato possibile approssimare la posa della mano in uno spazio a sette dimensioni \cite{lin2000modeling}.
 In alternativa, i dati campionati possono essere impiegati in forma diretta per generare ampi database di template sintetici, utili in fase di tracciamento per ricnoscere la mano in tutte le pose.
 
-Infine, una corretta modellazione del movimento naturale richiede non solo la restrizione spaziale delle pose ammissibili, ma anche l'apprendimento della dinamica temporale del moto. Per modellare le complesse dinamiche non lineari, sono stati proposti metodi basati sull'analisi dinamica agli autovalori (eigen-dynamic analysis, EDA).
-Tali metodi impiegano inizialmente la PCA per la riduzione dimensionale e, successivamente, modellano i movimenti indipendenti delle dita tramite sistemi lineari di basso ordine, combinandoli infine in un sistema dinamico lineare stocastico di ordine superiore.Metodologie alternative prevedono la schematizzazione dello spazio delle configurazioni sotto forma di albero di ricerca, costruito mediante tecniche di clustering gerarchico o partizionamento dell'autospazio. 
+Infine, una corretta modellazione del movimento naturale richiede non solo la restrizione spaziale delle pose ammissibili, ma anche l'apprendimento della dinamica temporale del moto. 
+Per modellare le complesse dinamiche non lineari, sono stati proposti metodi basati sull'analisi dinamica agli autovalori (eigen-dynamic analysis, EDA).
+Tali metodi impiegano inizialmente la PCA per la riduzione dimensionale e, successivamente, modellano i movimenti indipendenti delle dita tramite sistemi lineari di basso ordine, combinandoli infine in un sistema dinamico lineare stocastico di ordine superiore.
+Metodologie alternative prevedono la schematizzazione dello spazio delle configurazioni sotto forma di albero di ricerca, costruito mediante tecniche di clustering gerarchico o partizionamento dell'autospazio. 
 
 
 \subsection{Modellazione della forma}
+
+La mano presenta simultaneamente componenti articolate e componenti elastiche, la scelta del modello geometrico richiede pertanto un accurato bilanciamento tra il realismo visivo desiderato e l'efficienza computazionale richiesta dall'applicazione. 
+Nei sistemi basati sul tracciamento, il modello tridimensionale deve essere proiettato ripetutamente sul piano immagine per allineare le immagini in input con il modello osservato.
+Tali stringenti limitazioni pratiche hanno storicamente motivato l'impiego di modelli geometrici approssimati e di rapida elaborazione.
+
+Per massimizzare l'efficienza, una metodologia ampiamente diffusa consiste nell'approssimare i segmenti scheletrici e le giunzioni articolari della mano mediante un insieme di primitive geometriche elementari, quali cilindri, sfere ed ellissoidi. 
+Alcuni approcci in letteratura hanno impiegato le quadriche come primitive geometriche, sfruttandone la geometria proiettiva per sviluppare algoritmi estremamente veloci per il calcolo di proiezioni e reciproca visibilità tra le parti (Figura \ref{fig:hand_shape_models}a).
+Un'ulteriore strategia di semplificazione è rappresentata dai modelli dipendenti dalla prospettiva (view-dependent), come il cosiddetto "cardboard model" (modello a cartoncino).
+In tale formulazione, qualora osservata da una direzione ortogonale al palmo, la mano viene schematizzata semplicemente come un'unione di forme rettangolari associate ai vari segmenti, demandando il computo delle occlusioni all'utilizzo di una mappa di visibilità (Figura \ref{fig:hand_shape_models}b). 
+Sebbene questi modelli semplificati, fondati su primitive spaziali, siano facilmente processabili per valutare rapidamente le distanze, essi offrono una rappresentazione solo grossolana e approssimativa della reale morfologia della mano.
+
+Al fine di rappresentare la mano con una maggiore fedeltà anatomica, sono stati proposti modelli di forma più realistici e morfologicamente complessi.
+La modellazione può avvalersi di superfici matematiche continue, come le superfici B-spline, i cui punti di controllo vengono vincolati in modo diretto ai segmenti dello scheletro sottostante. 
+Metodologie alternative impiegano mesh triangolari abbinate a tecniche grafiche di deformazione della pelle (skinning), come il Linear Blend Skinning (LBS), che consentono un adattamento maggiormente realistico della superficie ai cambiamenti di posa della struttura cinematica (Figura \ref{fig:hand_shape_models}c).
+% I sistemi più avanzati basano la definizione di tali deformazioni su modelli statistici appresi direttamente da scansioni tridimensionali ad alta risoluzione (approccio data-driven), risultando in grado di simulare in modo accurato e naturale le alterazioni non rigide della forma cutanea causate dal piegamento delle articolazioni. % verificare quest'ultima frase
+
+Tuttavia, l'implementazione pratica di modelli ad alto realismo è frequentemente abbinata all'impiego di sensori di profondità (depth sensors) o di sistemi di visione stereoscopica, eliminando le complesse operazioni di proiezione.
+
+\begin{figure}[tbp]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/hand_shape_models.png}
+    \caption{Modelli di forma della mano con differenti complessità.}
+    \label{fig:hand_shape_models}
+\end{figure}
+
+% possibile descrivere un po' gli ultimi modelli descritti: b-spline, skinning.
+% possibile aggiungere nota per la mappa di visibilità del modello cardboard.
+
+% Nel contesto del *cardboard model* (modello a cartoncino), la mappa di visibilità (*visibility map*) è una struttura dati impiegata per determinare l'ordine di profondità e risolvere esplicitamente le auto-occlusioni tra i diversi segmenti planari che compongono la mano.
+
+% Nello specifico, il modello a cartoncino schematizza la mano dal punto di vista prospettico come un insieme di rettangoli bidimensionali, ciascuno ancorato a una specifica falange o al palmo. Durante i movimenti di articolazione o in presenza di flessioni delle dita, le proiezioni bidimensionali di tali rettangoli tendono inevitabilmente a sovrapporsi sul piano immagine.
+
+% La mappa di visibilità stabilisce quali regioni o bordi dei singoli rettangoli risultino effettivamente visibili alla telecamera e quali debbano essere considerati occlusi da parti anatomiche poste anteriormente lungo la linea di vista. Attraverso questa gerarchia di visibilità:
+
+% * Viene identificato quale rettangolo si trovi in primo piano rispetto agli altri nelle zone di intersezione.
+
+
+% * Si definisce l'effettivo contorno visibile della mano proiettata, scartando i segmenti interni o coperti.
+
+
+% * Si consente un confronto corretto ed efficiente delle caratteristiche estratte dal modello con quelle rilevate nell'immagine reale, evitando di attribuire errori di allineamento a bordi teorici che risultano di fatto nascosti.
+
+
+\subsection{Adattamento cinematico}
+
+L'adattamento cinematico (\emph{kinematic fitting}) e la calibrazione costituiscono un passaggio fondamentale per garantire l'accuratezza di qualsiasi sistema di stima della posa basato su un modello. 
+I parametri individuali della mano, quali la lunghezza e la larghezza dei segmenti scheletrici, variano considerevolmente da soggetto a soggetto e l'utilizzo di un modello generico non calibrato influisce significativamente sull'accuratezza della stima. 
+
+Nonostante la sua rilevanza, la procedura di calibrazione cinematica presenta notevoli complessità metodologiche, riscontrabili anche nell'ambito più generale della modellazione del corpo umano.
+Mentre sensori tridimensionali o tecniche di ricostruzione multivista consentono di rilevare con precisione la superficie esterna, stimare la posizione tridimensionale esatta dei centri articolari interni e la lunghezza effettiva dei singoli segmenti scheletrici (\emph{link lengths}) rimane un compito tutt'altro che banale.
+Per tale ragione, gran parte degli studi storici in letteratura adotta approcci di calibrazione puramente manuali.
+A supporto di queste procedure, vengono frequentemente impiegate relazioni statistiche di natura antropometrica, le quali consentono di determinare l'ubicazione dei giunti interni partendo da misure fisiche esterne.
+
+Al fine di superare i limiti dell'approccio manuale, sono state proposte diverse strategie semi-automatiche o automatiche:
+
+\begin{itemize}
+    \item Adattamento basato su punti salienti (\emph{landmark fitting}):
+    il processo prevede la marcatura manuale o semi-guidata di specifici punti notevoli su immagini acquisite da prospettive multiple; 
+    i parametri dimensionali di un modello geometrico vengono successivamente ottimizzati per minimizzare la distanza rispetto a tali riferimenti.
+
+    \item Stima congiunta di posa e scala:
+    la lunghezza dei segmenti è aggiornata di pari passo con la stima delle variabili di posa.
+    
+    \item Calibrazione guidata da proporzioni antropometriche:
+    l'analisi bidimensionale di una posa nota (tipicamente una configurazione a mano aperta e distesa) viene combinata con vincoli e rapporti biometrici fissi tra le falangi.
+
+    \item Tracciamento stereoscopico e cinematica inversa scalabile:
+    vengono impiegate telecamere stereoscopiche per rilevare la posizione tridimensionale di marcatori applicati sulle dita (come LED colorati) durante sequenze controllate di afferramento (\emph{grasping}); 
+    i dati acquisiti vengono quindi elaborati mediante algoritmi di cinematica inversa per  scalare in modo indipendente ciascun dito del modello base rispetto all'utente.
+\end{itemize}
 
