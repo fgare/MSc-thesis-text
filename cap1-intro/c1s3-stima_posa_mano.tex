@@ -1,0 +1,25 @@
+\section{Stima della posa della mano}
+
+I metodi di stima parziale della posa della mano costituiscono estensioni dei metodi basati sull'apparenza (\emph{appearance-based methods}) e mirano a estrarre modelli approssimati del movimento della mano, individuando posizione e orientamento di dita e palmo.
+Questi algoritmi di stima sono nati nell'ambito di progetti di interazione uomo-macchina per applicazioni di realtà aumentata -- in cui l'utente poteva interagire con documenti e presentazioni proiettati sulla scrivania -- oppure per l'interazione con oggetti in ambienti virtuali.
+
+L'architettura tipica di un sistema generico si articola in una sequenza di moduli:
+a partire dall'acquisizione dell'immagine, la mano viene localizzata e ne vengono estratte le caratteristiche salienti, impiegate sia per la classificazione del gesto sia per la stima della posa.
+Il motore di classificazione dei gesti altro non è che un classificatore di pattern,
+addestrato per attivare selettrivamente l'algoritmo di stima della posa solo quando la configurazione della mano corrisponde a specifici gesti dell'interfaccia (ad esempio, il gesto di puntamento).
+
+
+\subsection{Localizzazione della mano}
+
+La localizzazione della mano è un primo passo essenziale del processo di stima della posa,comunemente affrontato mediante un processo di segmentazione del colore della pelle.
+Altri metodi contemplano la rimozione di uno sfondo statico o l'uso di modelli di sfondo adattivi.
+Tuttavia, le ombre costituiscono un problema considerevole per gli algoritmi di sottrazione dello sfondo, che possono essere confusi da variazioni di colore e di illuminazione.
+Alcuni studi hanno utilizzato telecamere a infrarossi, in grado di fornire una rapida ma efficace soluzione grazie a un'operazione di soglia (\emph{threshold}) tarata sulla temperatura umana.
+% continua...
+
+
+\subsection{Classificazione dei gesti}
+
+\subsection{Estrazione delle caratteristiche}
+
+\subsection{Stima della posa}
