@@ -11,14 +11,23 @@ addestrato per attivare selettrivamente l'algoritmo di stima della posa solo qua
 
 \subsection{Localizzazione della mano}
 
-La localizzazione della mano è un primo passo essenziale del processo di stima della posa,comunemente affrontato mediante un processo di segmentazione del colore della pelle.
-Altri metodi contemplano la rimozione di uno sfondo statico o l'uso di modelli di sfondo adattivi.
-Tuttavia, le ombre costituiscono un problema considerevole per gli algoritmi di sottrazione dello sfondo, che possono essere confusi da variazioni di colore e di illuminazione.
-Alcuni studi hanno utilizzato telecamere a infrarossi, in grado di fornire una rapida ma efficace soluzione grazie a un'operazione di soglia (\emph{threshold}) tarata sulla temperatura umana.
-% continua...
+La localizzazione della mano è un primo passo essenziale del processo di stima della posa.
+Esso è comunemente affrontato mediante un processo di segmentazione del colore della pelle,ma altri metodi contemplano la rimozione di uno sfondo statico o l'uso di modelli di sfondo adattivi.
+Le ombre costituiscono tuttavia un problema considerevole per gli algoritmi indicati, che possono essere confusi da variazioni di colore e di illuminazione.
+Alcuni studi hanno trovato una soluzione utilizzando telecamere a infrarossi, in grado di fornire una rapida ma efficace soluzione tramite un'operazione di soglia (\emph{threshold}) tarata alla temperatura umana.
+% possibile indicare altri modelli
+
+Un altro approccio per la localizzazione della mano consiste nell'uso di classificatori per il rilevamento di oggetti, in cui sottoregioni all'interno dell'immagine sono classificate per determinare la presenza di un oggetto.
+L'uso di classificatori classici non permetterebbe però di valutare un numero sufficiente di ipotesi (espresse come regioni all'interno di un'immagine) in un tempo ragionevole.
+Si è perciò ricorso a cascate di classificatori, nelle quali un primo classificatore molto veloce è posto in cima alla gerarchia, così da scartare immediatamente un gran numero di ipotesi; 
+clasificatori sempre più accurati e computazionalmente costosi sono poi utilizzati continuando nella sequenza.
+Il contro di questo approccio risiede nelle difficoltà di addrestramento di questi classificatori, il quale risulta sempre molto lungo per la necessità di raccogliere un gran numero di immagini di mani in diverse pose e angolazioni.
 
 
 \subsection{Classificazione dei gesti}
+
+
+
 
 \subsection{Estrazione delle caratteristiche}
 
