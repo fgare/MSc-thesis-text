@@ -6,7 +6,7 @@ Questi algoritmi di stima sono nati nell'ambito di progetti di interazione uomo-
 L'architettura tipica di un sistema generico si articola in una sequenza di moduli:
 a partire dall'acquisizione dell'immagine, la mano viene localizzata e ne vengono estratte le caratteristiche salienti, impiegate sia per la classificazione del gesto sia per la stima della posa.
 Il motore di classificazione dei gesti altro non è che un classificatore di pattern,
-addestrato per attivare selettrivamente l'algoritmo di stima della posa solo quando la configurazione della mano corrisponde a specifici gesti dell'interfaccia (ad esempio, il gesto di puntamento).
+addestrato per attivare selettivamente l'algoritmo di stima della posa solo quando la configurazione della mano corrisponde a specifici gesti dell'interfaccia (ad esempio, il gesto di puntamento).
 
 
 \subsection{Localizzazione della mano}
@@ -20,15 +20,38 @@ Alcuni studi hanno trovato una soluzione utilizzando telecamere a infrarossi, in
 Un altro approccio per la localizzazione della mano consiste nell'uso di classificatori per il rilevamento di oggetti, in cui sottoregioni all'interno dell'immagine sono classificate per determinare la presenza di un oggetto.
 L'uso di classificatori classici non permetterebbe però di valutare un numero sufficiente di ipotesi (espresse come regioni all'interno di un'immagine) in un tempo ragionevole.
 Si è perciò ricorso a cascate di classificatori, nelle quali un primo classificatore molto veloce è posto in cima alla gerarchia, così da scartare immediatamente un gran numero di ipotesi; 
-clasificatori sempre più accurati e computazionalmente costosi sono poi utilizzati continuando nella sequenza.
-Il contro di questo approccio risiede nelle difficoltà di addrestramento di questi classificatori, il quale risulta sempre molto lungo per la necessità di raccogliere un gran numero di immagini di mani in diverse pose e angolazioni.
+classificatori sempre più accurati e computazionalmente costosi sono poi utilizzati continuando nella sequenza.
+Il contro di questo approccio risiede nelle difficoltà di addestramento di questi classificatori, il quale risulta sempre molto lungo per la necessità di raccogliere un gran numero di immagini di mani in diverse pose e angolazioni.
 
 
 \subsection{Classificazione dei gesti}
 
+Nei sistemi a stima parziale, il riconoscimento gestuale è strettamente accoppiato alla stima della posa e opera su un vocabolario ristretto di configurazioni statiche.
+Le posture canoniche sono:
+la mano completamente aperta, impiegata prevalentemente per compiti di navigazione o come configurazione generica per generare comandi in base al numero e alla visibilità delle dita estese;
+le posture di puntamento (con uno o due indici estesi), adottate in quasi tutte le interfacce per la selezione nello spazio;
+le configurazioni di manipolazione dell'oggetto, fondate sulla distanza e sul movimento relativo tra pollice e indice per eseguire operazioni di afferramento (\emph{grabbing}), traslazione, rotazione e ridimensionamento.
 
+% fig 5 del paper di erol
 
 
 \subsection{Estrazione delle caratteristiche}
 
+La stima geometrica della posa a partire dalle posture sopra descritte richiede l'es\-tra\-zio\-ne di elementi di riferimento stabili sul piano immagine:
+nel particolare posizione e orientamento di mano, polpastrelli e dita.
+
+Chiamiamo \emph{silhouette} il contorno della mano fornito dall'algoritmo di segmentazione.
+La posizione del palmo è spesso identificata con il baricentro della silhouette o, in maniera più stabile, con il punto di massima distanza dal contorno.
+L'individuazione dei polpastrelli è realizzata tramite tecniche di correlazione con maschere circolari (invarianti alla rotazione), template bidimensionali estratti da immagini reali o attraverso la ricerca dei massimi locali di curvatura lungo il contorno della silhouette.
+L'orientamento delle dita e della mano è invece ottenuto analizzando la direzione degli assi principali della silhouette.
+
+Le caratteristiche estratte possono essere tracciate temporalmente attraverso i fotogrammi tramite filtri di Kalman o euristiche in grado di limitare la finestra di ricerca sulla base della posizione delle caratteristiche nel frame precedente. 
+Per ridurre le distorsioni prospettiche e operare su sfondi complessi alcuni sistemi estraggono caratteristiche tridimensionali impiegando telecamere multiple o avvalendosi di marcatori fisici
+
+
 \subsection{Stima della posa}
+
+Nelle applicazioni bidimensionali le caratteristiche estratte possono essere utilizzate direttamente, così da evitare la stima tridimensionale della posa della mano.
+Nelle interfacce tridimensionali la configurazione deve essere invece determinata ricorrendo a sistemi stereoscopici, i quali consentono di ricostruire le posizioni tridimensionali dei polpastrelli e l'orientamento della mano nello spazio.
+Infatti, le posizioni dei polpastrelli e la localizzazione del palmo possono essere determinate da una visione 2D solo qualora l'interazione preveda il movimento rigido della mano. 
+Per svincolare l'utente da angolazioni prefissate, alcune architetture multicamera selezionano dinamicamente la vista migliore per l'analisi.
