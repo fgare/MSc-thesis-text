@@ -1,1 +1,19 @@
-\section{Tracciamento basato su modelli}
+\section{Tracciamento tridimensionale basato su modelli}
+
+L'architettura di un sistema generico di stima e tracciamento basato su modello opera ricercando, all'interno dello spazio delle configurazioni, i parametri che minimizzano l'errore di corrispondenza tra le caratteristiche estratte dall'immagine in ingresso e quelle generate sinteticamente dal modello.
+La struttura di tali sistemi si articola in quattro moduli: inizializzazione, predizione, estrazione delle caratteristiche e ricerca.
+
+La fase di inizializzazione risulta strettamente necessaria al primo fotogramma, poiché, in assenza di stime precedenti, occorre definire la configurazione spaziale di partenza per avviare il tracciamento.
+Tale problematica è frequentemente risolta ricorrendo a procedure manuali oppure chiedendo all'utente di assumere una posa predefinita e priva di occlusioni, come la mano completamente aperta.
+
+Nei fotogrammi successivi interviene il modulo di predizione, il quale avvia la fase di ricerca a partire dalla posa precedente e basandosi su un modello di dinamica del sistema.
+
+Il modulo dedicato all'estrazione delle caratteristiche ha il compito di isolare i dati visivi necessari al calcolo dell'errore di allineamento spaziale.
+Nella maggior parte delle architetture vengono sfruttate caratteristiche bidimensionali sul piano immagine, richiedendo pertanto la proiezione continua del modello tridimensionale. Operazione computazionalmente onerosa.
+Approcci alternativi e meno comuni impiegano caratteristiche tridimensionali acquisite tramite sensori di profondità o sistemi multicamera.
+
+Infine, il modulo di ricerca esegue l'ottimizzazione vera e propria dello stato, valutando la somiglianza tra le metriche estratte e quelle sintetizzate dal modello.
+Questo processo è storicamente implementato secondo due paradigmi principali. 
+Il tracciamento a singola ipotesi si basa su una ricerca locale e mantiene unicamente la stima considerata migliore a ogni singola iterazione.
+Esso risulta computazionalmente efficiente ma estremamente vulnerabile a perdite di tracciamento su sequenze prolungate.
+I sistemi più avanzati adottano il tracciamento a ipotesi multiple per ovviare a queste criticità, il quale, mantenendo simultaneamente molteplici stime di posa, garantisce un'elevata tolleranza alle ambiguità visive e ai fallimenti locali, permettendo al processo di tracciamento di proseguire anche qualora l'ipotesi primaria dovesse rivelarsi inesatta.
