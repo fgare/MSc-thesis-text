@@ -17,3 +17,72 @@ Questo processo è storicamente implementato secondo due paradigmi principali.
 Il tracciamento a singola ipotesi si basa su una ricerca locale e mantiene unicamente la stima considerata migliore a ogni singola iterazione.
 Esso risulta computazionalmente efficiente ma estremamente vulnerabile a perdite di tracciamento su sequenze prolungate.
 I sistemi più avanzati adottano il tracciamento a ipotesi multiple per ovviare a queste criticità, il quale, mantenendo simultaneamente molteplici stime di posa, garantisce un'elevata tolleranza alle ambiguità visive e ai fallimenti locali, permettendo al processo di tracciamento di proseguire anche qualora l'ipotesi primaria dovesse rivelarsi inesatta.
+
+
+\subsection{Estrazione e confronto delle caratteristiche}
+
+Il modulo di estrazione delle caratteristiche è determinante sia per la robustezza alle auto-occlusioni e agli sfondi complessi, sia per la velocità di processamento computazionale.
+La letteratura viene suddivisa in base alla natura dei descrittori impiegati:
+
+\begin{itemize}
+    \item Caratteristiche di alto livello (\emph{High-level features}):
+    comprendono la stima delle posizioni dei polpastrelli, dei centri articolari e dei segmenti scheletrici (links).
+    Pur garantendo rappresentazioni compatte e veloci, risultano estremamente vulnerabili alle occlusioni e spesso richiedono marcatori fisici colorati per essere riconosciute in modo affidabile.
+
+    \item Caratteristiche di basso livello (\emph{Low-level features}):
+    includono bordi (edges), contorni e silhouette binarie.
+    L'approccio tipico proietta un modello volumetrico della mano sull'immagine per calcolare i contorni occludenti;
+    la corrispondenza tra i contorni del modello e dell'immagine è poi stabilita secondo un criterio di prossimità (es. il punto più vicino in direzione normale).
+    I bordi della mano sono infine estratti utilizzando la proiezione del modello come guida per la ricerca del gradiente massimo locale.
+    Per aumentare la robustezza su sfondi complessi, molti metodi integrano mappe di colore della pelle o combinazioni di bordi, flusso ottico, ombreggiature o ricerca delle smussatura (\emph{chamfer matching}).
+
+    \item Caratteristiche 3D (3D features): 
+    ricavate mediante sensori a luce strutturata, telecamere stereo o tecniche di ricostruzione volumetrica (\emph{visual hull}). 
+    Sebbene introducano un costo computazionale aggiuntivo, le mappe di profondità e i dati spaziali permettono di mitigare radicalmente le ambiguità proiettive e le auto-occlusioni.
+\end{itemize}
+
+
+\subsection{Tracciamento a singola ipotesi}
+
+Il tracciamento a singola ipotesi (Single Hypothesis Tracking) si configura come una procedura di ricerca deterministica orientata a individuare in modo univoco la configurazione di parametri in grado di minimizzare l'errore di allineamento tra il modello e i dati osservati.
+Dal punto di vista architetturale e algoritmico, la letteratura suddivide tali approcci in due macro-categorie fondamentali:
+le tecniche basate sull'ottimizzazione numerica esplicita e le metodologie fondate sull'applicazione di modelli a forze fisiche.
+
+L'approccio predominante per l'adattamento del modello alle caratteristiche estratte si avvale di tecniche di ottimizzazione numerica standard. 
+Tra le soluzioni algoritmiche maggiormente implementate figura il metodo di Gauss-Newton, integrato con passaggi di stabilizzazione volti a ovviare alle singolarità cinematiche che possono generarsi; 
+tali singolarità emergono sistematicamente quando la variazione di un sottoinsieme di parametri non produce effetti rilevabili sull'apparenza proiettata della mano.
+
+Ulteriori formulazioni per la minimizzazione della funzione di errore spaziale ricorrono a euristiche e algoritmi di ricerca non lineare.
+Tra questi si annoverano il simplesso di Nelder-Mead (NMS), gli algoritmi genetici (GA), il Simulated Annealing (SA) e varianti derivate dalla discesa del gradiente, come lo Stochastic Meta Descent (SMD).
+Al fine di semplificare lo spazio di ricerca, diverse architetture adottano una strategia di frammentazione del problema (\emph{divide et impera}) basata su una stima iterativa in due fasi: 
+dapprima viene calcolato il moto globale della mano ed, in seguito, gli angoli articolari delle dita.
+Infine, trovano applicazione i filtri di Kalman, con specifico riferimento all'Unscented Kalman Filter (UKF).
+
+Un paradigma alternativo per l'adattamento geometrico del modello si fonda sull'utilizzo di forze fisiche virtuali. 
+In tale formulazione, l'errore di corrispondenza visiva o spaziale tra l'ipotesi e l'osservazione viene tradotto vettorialmente in un campo di forze applicate direttamente sulla superficie del modello tridimensionale articolato.
+L'aggiornamento dei parametri di posa si ottiene, di conseguenza, mediante la risoluzione iterativa delle equazioni dinamiche del modello cinematico sottoposto a tali sollecitazioni esterne. 
+Tali forze correttive possono essere derivate dall'applicazione di algoritmi di registrazione spaziale, come l'\emph{Iterative Closest Point (ICP)} su dati tridimensionali stereoscopici, oppure calcolando le discrepanze geometriche rispetto a un inviluppo visivo (visual hull) generato a partire dalle silhouette bidimensionali. 
+
+
+\subsection{Tracciamento a ipotesi multiple}
+
+Il tracciamento a ipotesi multiple (\emph{Multiple Hypotheses Tracking}, MHT) modella la densità di probabilità a posteriori mantenendo simultaneamente diverse stime di posa, al fine di superare le criticità legate a minimi locali, auto-occlusioni e ambiguità visive intrinseche all'ottimizzazione a singola ipotesi. 
+Di seguito vengono presentate le metodologie più rappresentative.
+
+\begin{itemize}
+    \item \emph{Filtri a particelle (Particle filters)}: 
+    Implementano un filtraggio bayesiano sequenziale approssimando la distribuzione di probabilità spaziale tramite un insieme discretizzato di campioni pesati (particelle). 
+    Per gestire l'onere computazionale derivante dall'elevata dimensionalità del modello cinematico, vengono frequentemente adottate varianti ottimizzate o ibridate con algoritmi di discesa locale, allo scopo di limitare il numero di particelle necessarie alla convergenza.
+
+    \item \emph{Filtri su strutture ad albero (Tree-based filters)}:
+    Discretizzano lo spazio degli stati mediante una rappresentazione gerarchica partizionata a multi-risoluzione. 
+    L'ag\-gior\-na\-men\-to probabilistico procede eliminando iterativamente i rami a bassa verosimiglianza (\emph{pruning}), consentendo un'esplorazione algoritmica rapida che facilita non solo il tracciamento continuo, ma anche il ripristino e l'inizializzazione del sistema.
+    
+    \item \emph{Reti Bayesiane}: 
+    Modellano le dipendenze articolari dello scheletro della mano fattorizzando la distribuzione a posteriori su grafi probabilistici a dimensionalità ridotta, quali le reti bayesiane dinamiche (DBN) o la \emph{Nonparametric Belief Propagation}. 
+    Tale scomposizione agevola l'imposizione di vincoli cinematici e biomeccanici tra segmenti rigidi interconnessi.
+    
+    \item \emph{Ricerca su database di template (Template database search)}: 
+    Mantengono in memoria molteplici ipotesi di stato confrontando le caratteristiche estratte visivamente con un vasto catalogo pre-calcolato di sagome sintetiche renderizzate. 
+    I candidati più promettenti vengono propagati nel tempo tramite algoritmi di esplorazione ad albero (come la \emph{beam search}) e successivamente raffinati nello spazio continuo mediante tecniche di ottimizzazione locale.
+\end{itemize}
