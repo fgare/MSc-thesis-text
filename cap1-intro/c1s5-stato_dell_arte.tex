@@ -1,8 +1,34 @@
 \section{Stato dell'arte nel riconoscimento 3D della mano}
 
-% TODO inserire sec 2.2 taxonomy dal paper di Erol
+% inserire sec 2.2 taxonomy dal paper di Erol
 % parlo dei modelli già esistenti: MANO, SMPL, Hamer
 % Contenuto suggerito: Modellazione parametrica SMPL/MANO, Reti Transformer HaMeR, Analisi Egocentrica AssemblyHands
+
+% Essendo la tua tesi incentrata sulle mani, SMPL non deve rubare la scena, ma va trattato come il fondamento teorico e matematico che ha reso possibile MANO. Dedicagli al massimo un paio di paragrafi, focalizzandoti esclusivamente su questi concetti chiave:
+% - Il cambio di paradigma: Evidenzia come SMPL abbia segnato il passaggio dai vecchi modelli basati su primitive geometriche (cilindri, sfere) o pesanti simulazioni fisiche, a modelli statistici "data-driven" (appresi da migliaia di scansioni 3D reali).
+% - La formulazione matematica (Linear Blend Skinning - LBS): Menziona che SMPL utilizza una mesh template di base deformata tramite LBS. Questo è il cuore algoritmico che verrà ereditato da MANO.
+% - Shape Blendshapes (Parametri di Forma): Spiega brevemente che il modello cattura le variazioni anatomiche tra individui diversi (es. mani più grandi o più affusolate) tramite coefficienti basati sulla PCA (Principal Component Analysis).
+% - Pose Blendshapes (Parametri di Posa): Sottolinea questo aspetto cruciale: la correzione delle deformazioni dei tessuti molli (es. il rigonfiamento di un muscolo o la piega della pelle quando si piega un'articolazione) in funzione della posa cinematica.
+% - Transizione verso MANO: Concludi spiegando che, avendo dimostrato l'efficacia di questa architettura compatta e differenziabile per il corpo, gli stessi principi matematici sono stati isolati, scalati e addestrati su scansioni specifiche per le dita, dando così origine a MANO. Non scendere in dettagli sull'anatomia del corpo intero.
+
+% Oltre ad HaMeR, MANO, AssemblyHands e GigaHands, per una tesi magistrale aggiornata sul tema EgoVision e interazione mano-oggetto dovresti coprire (almeno brevemente) queste categorie di modelli:
+
+% - Approcci Non-Parametrici (es. I2L-MeshNet):
+% Perché citarlo: Per mostrare completezza. MANO (approccio parametrico) ha il limite di non adattarsi perfettamente alle superfici reali se queste escono dal suo spazio statistico. Modelli come I2L-MeshNet (Moon et al., 2020) regrediscono direttamente le coordinate 3D dei vertici della mesh (o lixel), offrendo una via alternativa.
+
+% - Sistemi Whole-Body (es. FrankMocap):
+% Perché citarlo: È stato uno dei primi sistemi robusti a integrare il modulo delle mani all'interno del recupero del corpo intero da singola immagine. Utile per discutere il problema della scala (la mano è piccola rispetto al corpo) e dell'estrazione dei bounding box locali.
+
+% - Modelli per le occlusioni severe (es. HandOccNet):
+% Perché citarlo: Trattando interazioni mano-oggetto ed egocentriche, l'occlusione è il problema numero uno. Citare reti specifiche nate per "iniettare" informazioni sulle feature occluse (come HandOccNet) dimostra consapevolezza delle sfide di robustezza.
+
+% - Ricostruzione Congiunta Mano-Oggetto (es. lavori di Hasson et al.):
+% Perché citarli: Modelli che non ricostruiscono solo la mano, ma ottimizzano congiuntamente la mesh della mano e la mesh dell'oggetto (Joint Reconstruction), imponendo vincoli fisici (es. le dita non possono compenetrare l'oggetto). È fondamentale per il tema "interazioni mano-oggetto" del tuo titolo.
+
+% - Modelli basati su Grafi (es. HandGCNFormer o similari):
+% Perché citarli: Oltre ai Transformer puri (HaMeR), lo stato dell'arte fa uso di Graph Convolutional Networks (GCN) per modellare la topologia fissa dello scheletro della mano. Menzionarli fa capire come l'IA stia sfruttando i "prior" geometrici (il fatto che le ossa siano collegate in un modo specifico) per migliorare l'inferenza.
+
+% Consiglio per la struttura: Non dedicare una sezione enorme a ciascuno di questi. Raggruppali per "filone di ricerca" (es. Modelli parametrici vs non parametrici, Gestione delle occlusioni, Ricostruzione congiunta mano-oggetto) dedicando a ciascun filone un paragrafo sintetico che ne metta in luce pregi e difetti.
 
 \subsection{SMPL}
 
