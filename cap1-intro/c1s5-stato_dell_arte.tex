@@ -32,6 +32,24 @@
 
 \subsection{SMPL}
 
+Il modello SMPL (\emph{Skinned Multi-Person Linear}) nasce con l'obiettivo di animare in maniera realistica il corpo umano, rappresentando fedelmente le diverse forme del corpo, le deformazioni dovute alla posa e i movimenti dei tessuti molli.
+
+I metodi tradizionali cercano di adattare un insieme di vertici a una struttura scheletrica sottostante.
+I metodi di \emph{Blend skinning lineare (Linear Blend Skinning: LBS)} sono i più utilizzati in questo ambito, ma producono deformazioni irrealistiche in concomitanza delle giunture.
+Molti lavori precedenti sono stati presentati, senza che nessuno di essi fosse in grado di raggiungere risultati soddisfacenti:
+alcuni mancavano di realismo, altri erano limitati a un insieme di pose, altri ancora non erano compatibili con le librerie grafiche più diffuse.
+
+Il principio architetturale chiave del modello risiede nel disaccoppiamento tra le variazioni anatomiche individuali e le deformazioni non rigide dei tessuti molli dipendenti dalla posa.
+La superficie corporea viene infatti generata a partire da un template neutro di riposo (\emph{rest template}), sul quale si applicano linearmente correzioni additive distinte per la forma, la posa e la dinamica dei tessuti molli.
+Tale formulazione geometrica viene infine deformata nello spazio tridimensionale mediante l'algoritmo di Linear Blend Skinning, sfruttando una matrice sparsa di pesi di influenza.
+
+Un'altra peculiarità di SMPL è l'approccio \emph{data driven}, che permette di addestrare il modello direttamente da ampi database di immagini o scansioni tridimensionali.
+Nel caso di SMPL l'addestramento è avvenuto grazie a 1786 scansioni 3D di soggetti in una gran varietà di pose ed è stato guidato da una funzione obiettivo, definita per penalizzare le disparità di vertici tra le mesh registrate e quanto ricostruito dal modello.
+
+
+
+
+
 \subsection{MANO}
 
 \subsection{HaMeR}
