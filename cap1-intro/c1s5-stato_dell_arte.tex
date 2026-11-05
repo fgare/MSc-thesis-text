@@ -46,8 +46,45 @@ Tale formulazione geometrica viene infine deformata nello spazio tridimensionale
 Un'altra peculiarità di SMPL è l'approccio \emph{data driven}, che permette di addestrare il modello direttamente da ampi database di immagini o scansioni tridimensionali.
 Nel caso di SMPL l'addestramento è avvenuto grazie a 1786 scansioni 3D di soggetti in una gran varietà di pose ed è stato guidato da una funzione obiettivo, definita per penalizzare le disparità di vertici tra le mesh registrate e quanto ricostruito dal modello.
 
+\subsubsection{Formulazione matematica}
+
+SMPL definisce una funzione differenziabile $M(\vec{\beta}, \vec{\theta}; \Phi)$ che trasforma un insieme di coefficienti di identità e di postura nella posizione spaziale dei vertici di una mesh triangolare a topologia fissa, composta da $N = 6890$ vertici e $K = 23$ giunti articolari.
+
+I parametri in ingresso al modello (variabili di controllo) sono due vettori distinti:
+il primo è il vettore di forma $\vec{\beta} \in \mathbb{R}^{\vert{}\vec{\beta}\vert{}}$, che rappresenta i coefficienti lineari associati alle direzioni principali di variazione anatomica (estratte tramite PCA), modellando l'identità del soggetto;
+il secondo è il vettore di posa $\vec{\theta} \in \mathbb{R}^{3K + 3}$, che codifica la configurazione cinematica dello scheletro.
+% Ciascun elemento $\vec{\theta}_k \in \mathbb{R}^3$ è un vettore colonna in formato asse-angolo che descrive la rotazione relativa del giunto $k$ rispetto al suo genitore.
+% Tali vettori vengono mappati in matrici di rotazione ortogonali $3 \times 3$ appartenenti al gruppo $SO(3)$ mediante l'esponenziale della formula di Rodrigues.
+
+Il modello è poi governato da un set di parametri appresi staticamente durante la fase di calibrazione statistica su migliaia di scansioni 3D, denotati dall'insieme $\Phi = \{\bar{\mathbf{T}}, \mathcal{W}, \mathcal{S}, \mathcal{J}, \mathcal{P}\}$.
+%
+L'insieme è composto da:
+un \emph{template di riposo (rest template)} $\bar{\mathbf{T}} \in \mathbb{R}^{3N}$ che contiene le coordinate spaziali degli $N$ vertici nella \emph{posa zero} ($\theta^{*}$);
+un insieme di pesi di fusione (\emph{blend weights}) $\mathcal{W} \in \mathbb{R}^{N \times K}$ che specifica l'influenza che la trasformazione di ciascun giunto esercita su ogni vertice nel calcolo della deformazione globale;
+lo spazio delle deformazioni di forma $\mathcal{S} \in \mathbb{R}^{3N \times \vert \vec{\beta} \vert}$;
+il regressore dei centri articolari $\mathcal{J} \in \mathbb{R}^{3K \times 3N}$, che localizza i $K$ giunti in funzione della forma;
+lo spazio delle deformazioni di posa $\mathcal{P} \in \mathbb{R}^{3N \times 9K}$ che corregge i volumi dei tessuti molli.
+
+Oltre a questi parametri bisogna considerare una funzione di fusione della forma (\emph{blend shape function}) $B_{\mathcal{S}}(\vec{\beta}): \mathbb{R}^{\vert \vec{\beta} \vert} \to \mathbb{R}^{3N}$ e una funzione di fusione della posa $B_{\mathcal{P}}(\vec{\theta}): \mathbb{R}^{\vert \vec{\theta} \vert} \to \mathbb{R}^{3N}$.
 
 
+\paragraph{Blend skinning}
+
+Il blend skinning è la tecnica che regola la deformazione spaziale della mesh poligonale superficiale in risposta ai movimenti del sottostante scheletro cinematico.
+Più formalmente, a valle dell'applicazione delle correzioni additive di forma ($B_S$) e di posa ($B_P$) al template neutro ($\bar{\mathbf{T}}$), la mesh viene ruotata e traslata nello spazio globale calcolando la nuova posizione di ogni singolo vertice come media ponderata delle trasformazioni rigide indotte dai giunti ossei adiacenti.
+
+\medskip
+La posa del corpo è definita da una struttura scheletrica, dove il vettore $\vec{\theta_j} = \vec{w_k} \in \mathbb{R}^3$ denota la rotazione asse-angolo del giunto $k$ rispetto al nodo genitore nell'albero cinematico.
+Lo scheletro definito in SMPL ha 23 giunture, la posa è quindi definita dal vettore $\vec{\theta} = (\vec{w}_0^T, \dots, \vec{w}_K^T)^T$;
+ogni giunto è identificato da 3 parametri di rotazione, a cui ne vanno aggiunti 3 per l'orientamento della radice, quindi $\vert \vec{\theta} \vert = 3 \cdot 3 + 3 = 72$ parametri.
+Indichiamo con $\displaystyle \bar{w}_k = \frac{\vec{w}_k}{\Vert \vec{w}_k \Vert}$ il versore dell'asse di rotazione del giunto $k$.
+L'asse angolo di ogni giunto $j$ è trasformato in una matrice di rotazione usando la \emph{formula di Rodrigues}
+
+\begin{equation}
+    \exp(\vec{w}_j) = \mathcal{I} + \hat{\bar{w}}_j \sin(\Vert \vec{w}_j \Vert) + \hat{\bar{w}}_j^2 \cos(\Vert \vec{w}_j \Vert)
+\end{equation}
+
+% continua sez 3 smpl
 
 
 \subsection{MANO}
