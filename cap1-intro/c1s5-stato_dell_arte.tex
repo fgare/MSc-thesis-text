@@ -66,6 +66,7 @@ il regressore dei centri articolari $\mathcal{J} \in \mathbb{R}^{3K \times 3N}$,
 lo spazio delle deformazioni di posa $\mathcal{P} \in \mathbb{R}^{3N \times 9K}$ che corregge i volumi dei tessuti molli.
 
 Oltre a questi parametri bisogna considerare una funzione di fusione della forma (\emph{blend shape function}) $B_{\mathcal{S}}(\vec{\beta}): \mathbb{R}^{\vert \vec{\beta} \vert} \to \mathbb{R}^{3N}$ e una funzione di fusione della posa $B_{\mathcal{P}}(\vec{\theta}): \mathbb{R}^{\vert \vec{\theta} \vert} \to \mathbb{R}^{3N}$.
+A cui va aggiunta una \emph{funzione di blend skinning} $W$, applicata come passo finale per ruotare i vertici intorno ai giunti articolari con \emph{smoothing} definito dai pesi di fusione.
 
 
 \paragraph{Blend skinning}
@@ -74,18 +75,70 @@ Il blend skinning è la tecnica che regola la deformazione spaziale della mesh p
 Più formalmente, a valle dell'applicazione delle correzioni additive di forma ($B_S$) e di posa ($B_P$) al template neutro ($\bar{\mathbf{T}}$), la mesh viene ruotata e traslata nello spazio globale calcolando la nuova posizione di ogni singolo vertice come media ponderata delle trasformazioni rigide indotte dai giunti ossei adiacenti.
 
 \medskip
-La posa del corpo è definita da una struttura scheletrica, dove il vettore $\vec{\theta_j} = \vec{w_k} \in \mathbb{R}^3$ denota la rotazione asse-angolo del giunto $k$ rispetto al nodo genitore nell'albero cinematico.
-Lo scheletro definito in SMPL ha 23 giunture, la posa è quindi definita dal vettore $\vec{\theta} = (\vec{w}_0^T, \dots, \vec{w}_K^T)^T$;
-ogni giunto è identificato da 3 parametri di rotazione, a cui ne vanno aggiunti 3 per l'orientamento della radice, quindi $\vert \vec{\theta} \vert = 3 \cdot 3 + 3 = 72$ parametri.
-Indichiamo con $\displaystyle \bar{w}_k = \frac{\vec{w}_k}{\Vert \vec{w}_k \Vert}$ il versore dell'asse di rotazione del giunto $k$.
+La posa del corpo è definita da una struttura scheletrica, dove il vettore $\vec{\theta_j} = \vec{\omega}_k \in \mathbb{R}^3$ denota la rotazione asse-angolo del giunto $k$ rispetto al nodo genitore nell'albero cinematico.
+In questa rappresentazione, la direzione del vettore individua l'asse attorno al quale avviene la rotazione, mentre la sua norma $\Vert \vec{\omega}_j \Vert = \sqrt{\omega_{j,1}^2 + \omega_{j,2}^2 + \omega_{j,3}^2}$ ne rappresenta l'ampiezza (l'angolo di rotazione in radianti).
+% TODO inserire immagine
+Lo scheletro definito in SMPL ha 23 giunture, la posa è quindi definita dal vettore $\vec{\theta} = (\vec{\omega}_0^T, \dots, \vec{\omega}_K^T)^T$.
+Ogni giunto è identificato da 3 parametri di rotazione, a cui ne vanno aggiunti 3 per l'orientamento della radice, quindi $\vert \vec{\theta} \vert = 3 \cdot 3 + 3 = 72$ parametri.
+Indichiamo con $\displaystyle \bar{\omega}_k = \frac{\vec{\omega}_k}{\Vert \vec{\omega}_k \Vert}$ il versore dell'asse di rotazione del giunto $k$.
 L'asse angolo di ogni giunto $j$ è trasformato in una matrice di rotazione usando la \emph{formula di Rodrigues}
 
 \begin{equation}
-    \exp(\vec{w}_j) = \mathcal{I} + \hat{\bar{w}}_j \sin(\Vert \vec{w}_j \Vert) + \hat{\bar{w}}_j^2 \cos(\Vert \vec{w}_j \Vert)
+    \exp(\vec{\omega}_j) = \mathcal{I} + \hat{\bar{\omega}}_j \sin(\Vert \vec{\omega}_j \Vert) + \hat{\bar{\omega}}_j^2 \cos(\Vert \vec{\omega}_j \Vert)
 \end{equation}
 
-% continua sez 3 smpl
+dove $\hat{\bar{\omega}}_j$ è la matrice antisimmetrica dei tre vettori $\bar{\omega}$ e $\mathcal{I}$ è la matrice identità di dimensione $3 \times 3$.
 
+Sulla base di questo la funzione di blend skinng lineare è
+\begin{equation}
+    W(\bar{\mathbf{T}}, \mathbf{J}, \vec{\theta}, \mathcal{W}): \mathbb{R}^{3N \times 3K \times \vert \vec{\theta} \vert \times \vert \mathcal{W} \vert} \to \mathbb{R}^{3N} 
+\end{equation}
+la quale prende in input i vertici del template di riposo $\bar{\mathbf{T}}$, la posizione delle articolazioni $\mathbf{J}$, la posa $\vec{\theta}$, i pesi di fusione $\mathcal{W}$ e ritorna la mesh corretta. % TODO rivedere cosa ritorna la funzione
+
+Ciascun vertice $\bar{\mathbf{t}}_i$ in $\bar{\mathbf{T}}$ è trasformato in $\bar{\mathbf{t}}_i^{'}$ secondo la seguente formula:
+\begin{equation}
+    \bar{\mathbf{t}}_i' = \sum_{k=1}^{K} w_{k,i} \, G_k'(\vec{\theta}, \mathbf{J}) \, \bar{\mathbf{t}}_i
+\end{equation}
+dove $w_{k,i}$ è un elemento della matrice dei pesi di fusione $\mathcal{W}$ che rappresenta quanto la rotazione dell'articolazione $k$ influenza il vertice $i$, mentre $G_k'(\vec{\theta}, \mathbf{J})$ è definita come segue:
+\begin{align}
+    G_k'(\vec{\theta}, \mathbf{J}) &= \frac{G_k(\vec{\theta}, \mathbf{J})}{G_k(\vec{\theta}^{*}, \mathbf{J})} \\
+    %
+    G_k(\vec{\theta}, \mathbf{J}) &= \prod_{j \in A(k)}
+    \begin{bmatrix}
+        \exp (\vec{\omega}_j) & \mathbf{j}_j \\
+        \vec{0} & 1
+    \end{bmatrix}
+    % = \begin{bmatrix}
+    %     r_{11} & r_{12} & r_{13} & t_x \\
+    %     r_{21} & r_{22} & r_{23} & t_y \\
+    %     r_{31} & r_{32} & r_{33} & t_z \\ 
+    %     0 & 0 & 0 & 1
+    % \end{bmatrix}
+\end{align}
+
+$G_k'(\vec{\theta}, \mathbf{J})$ è la matrice quadrata $4 \times 4$ di trasformazione  globale relativa al giunto $k$.
+Essa incapsula la rototraslazione necessaria per muovere il vertice dalla posa neutra locale alla configurazione posta nello spazio tridimensionale globale.
+La matrice $G'_k$ si calcola sottraendo la configurazione della posa zero ed è ottenuta come prodotto a cascata lungo la catena cinematica (gli antenati $\mathcal{A}(k)$).
+In $G_k(\vec{\theta}, \mathbf{J})$, $\exp(\omega_j)$ è la matrice di rotazione $3 \times 3$ ortogonale generata applicando la formula di Rodrigues al vettore asse-angolo $\vec{\omega}_j \in \mathbb{R}^3$, e $\mathbf{j}_j$ è il vettore colonna tridimensionale estrapolato dal regressore $\mathbf{J}$ indicante la traslazione del centro articolare nel sistema di riferimento genitore.
+
+\medskip
+La formulazione fin ora descritta è la formulazione canonica della funzione di blend skinning lineare, molto diffusa ma dai risultati insoddisfacenti;
+responsabile dei ricorrenti effetti a \emph{caramella} e \emph{papillon}.
+SMPL risolve questo problema mantenendo inalterata la funzione di skinning ma modificando il template in maniera additiva e addestrando una funzione a predire la posizione delle giunture.
+
+Dal punto di vista dell'algebra lineare, la trasformazione completa della mesh pre-skinning $T_P(\vec{\beta}, \vec{\theta})$ si esprime vettorialmente tramite l'equazione:
+\begin{align}
+    M(\vec{\beta}, \vec{\theta}) &= W(T_P(\vec{\beta}, \vec{\theta}), \mathbf{J}(\vec{\beta}), \vec{\theta}, \mathcal{W})\\
+    %
+    T_P(\vec{\beta}, \vec{\theta}) &= \bar{\mathbf{T}} + B_{\mathcal{S}}(\vec{\beta}) + B_{\mathcal{P}}(\vec{\theta})
+\end{align}
+dove $B_{\mathcal{S}}(\vec{\beta})$ e $B_{\mathcal{P}}(\vec{\theta})$ producono vettori che rappresentano un offset dal template.
+
+Analizzando la trasformazione a livello di singolo vertice, la posizione finale del vertice $i$-esimo (rappresentato come vettore colonna in coordinate spaziali omogenee $\vec{t}'_i \in \mathbb{R}^4$) è governata dalla seguente sommatoria:
+\begin{equation}
+    \bar{\mathbf{t}}'_i = \sum_{k=1}^K w_{k,i} \, G'_k(\vec{\theta}, \mathbf{J}(\vec{\beta})) \, \Big( \bar{\mathbf{t}}_i + b_{\mathcal{S},i}(\vec{\beta}) + b_{\mathcal{P},i}(\vec{\theta}) \Big)
+\end{equation}
+dove $b_{\mathcal{S},i}(\vec{\beta})$ e $b_{\mathcal{P},i}(\vec{\theta})$ sono vertici dei vettori ottenuti rispettivamente da $B_{\mathcal{S}}(\vec{\beta})$ e $B_{\mathcal{P}}(\vec{\theta})$.
 
 \subsection{MANO}
 
