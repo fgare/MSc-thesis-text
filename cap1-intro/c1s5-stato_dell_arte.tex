@@ -140,6 +140,40 @@ Analizzando la trasformazione a livello di singolo vertice, la posizione finale 
 \end{equation}
 dove $b_{\mathcal{S},i}(\vec{\beta})$ e $b_{\mathcal{P},i}(\vec{\theta})$ sono vertici dei vettori ottenuti rispettivamente da $B_{\mathcal{S}}(\vec{\beta})$ e $B_{\mathcal{P}}(\vec{\theta})$.
 
+
+\paragraph{Forme di fusione (shape blend shapes)}
+
+La variabilità morfologica e antropometrica che caratterizza i diversi individui viene modellata attraverso una funzione lineare $B_S$, che riceve in ingresso un vettore di parametri di forma $\vec{\beta} \in \mathbb{R}^{\vert \vec{\beta} \vert}$ e genera un vettore di scostamenti tridimensionali dei vertici rispetto alla configurazione neutra del template $\bar{\mathbf{T}}$.
+
+\begin{equation}
+B_S(\vec{\beta}; \mathcal{S}) = \sum_{n=1}^{|\vec{\beta}|} \beta_n S_n \in \mathbb{R}^{3N}
+\end{equation}
+
+Dove $\vec{\beta} = \begin{pmatrix} \beta_1, \dots, \beta_{\vert{}\vec{\beta}\vert{}} \end{pmatrix}^T \in \mathbb{R}^{\vert \vec{\beta} \vert}$ è il vettore colonna contenente i coefficienti di forma scalari impostati o stimati per caratterizzare l'identità del soggetto.
+Ciascuna componente $\beta_n \in \mathbb{R}$ funge da moltiplicatore per la rispettiva direzione di deformazione.
+%
+$\mathbf{S}_n \in \mathbb{R}^{3N}$ rappresenta l'$n$-esimo vettore colonna di spostamento dei vertici, corrispondente a una specifica componente principale di deformazione ortonormale.
+Ciascun vettore concatena le deviazioni cartesiane tridimensionali $(\Delta x_i, \Delta y_i, \Delta z_i)$ per tutti gli $N$ vertici della mesh ($3 \times N$ elementi).
+%
+$\mathcal{S} = \begin{pmatrix} \mathbf{S}_1, \mathbf{S}_2, \dots, \mathbf{S}_{\vert \vec{\beta} \vert}\end{pmatrix} \in \mathbb{R}^{3N \times \vert \vec{\beta} \vert}$ è la matrice le cui colonne sono costituite dai vettori $\mathbf{S}_n$.
+Tale matrice racchiude l'intera base ortonormale dello spazio delle forme appreso statisticamente.
+
+Attraverso tale rappresentazione matriciale compatta, la trasformazione può essere espressa direttamente come un prodotto matrice-vettore:
+\begin{equation}
+B_S(\vec{\beta}) = \mathcal{S}\vec{\beta}
+\end{equation}
+
+La matrice $\mathcal{S}$ costituisce un parametro statico appreso dal modello durante la fase di calibrazione e addestramento statistico su ampi dataset di scansioni tridimensionali (come il database CAESAR).
+Nello specifico, i vettori $\mathbf{S}_n$ vengono estratti applicando l'Analisi delle Componenti Principali (PCA) sulle coordinate dei vertici delle mesh di addestramento, preventivamente allineate alla topologia del template e normalizzate rispetto alla posa.
+Tale procedura di disaccoppiamento garantisce che le componenti principali catturino esclusivamente le differenze biometriche e proporzionali individuali (quali altezza, corporatura e distribuzione volumetrica), senza incorporare alterazioni geometriche indotte da articolazioni posturali.
+
+% TODO rivedere quest'ultima parte
+
+
+\paragraph{Forme di fusione della posa (pose blend shapes)}
+
+
+
 \subsection{MANO}
 
 \subsection{HaMeR}
