@@ -141,7 +141,7 @@ Analizzando la trasformazione a livello di singolo vertice, la posizione finale 
 dove $b_{\mathcal{S},i}(\vec{\beta})$ e $b_{\mathcal{P},i}(\vec{\theta})$ sono vertici dei vettori ottenuti rispettivamente da $B_{\mathcal{S}}(\vec{\beta})$ e $B_{\mathcal{P}}(\vec{\theta})$.
 
 
-\paragraph{Forme di fusione (shape blend shapes)}
+\paragraph{Forme di fusione della forma (shape blend shapes)}
 
 La variabilità morfologica e antropometrica che caratterizza i diversi individui viene modellata attraverso una funzione lineare $B_S$, che riceve in ingresso un vettore di parametri di forma $\vec{\beta} \in \mathbb{R}^{\vert \vec{\beta} \vert}$ e genera un vettore di scostamenti tridimensionali dei vertici rispetto alla configurazione neutra del template $\bar{\mathbf{T}}$.
 
@@ -172,6 +172,35 @@ Tale procedura di disaccoppiamento garantisce che le componenti principali cattu
 
 \paragraph{Forme di fusione della posa (pose blend shapes)}
 
+Definiamo $R: \mathbb{R}^{\vert \vec{\theta} \vert} \to \mathbb{R}^{9K}$ la funzione che mappa il vettore globale dei parametri di posa $\vec{\theta}$ nella concatenazione di tutte le matrici di rotazione relativa $3 \times 3$ associate ai singoli giunti, calcolate singolarmente tramite l'esponenziale della formula di Rodrigues $\exp(\vec{\omega}_j)$.
+Poiché lo scheletro è modellato in 23 giunture, $R(\vec{\theta})$ è un vettore di $23 \cdot 9 = 207$ elementi.
+
+SMPL formula gli scostamenti dei vertici come una trasformazione lineare rispetto agli elementi delle matrici di rotazione.
+Definendo la deviazione rotazionale rispetto alla configurazione neutra di riposo $\vec{\theta}^*$ come il vettore colonna $R^*(\vec{\theta}) = (R(\vec{\theta}) - R(\vec{\theta}^*)) \in \mathbb{R}^{9K}$, lo spostamento aggregato dei vertici si calcola come:
+
+\begin{equation}
+B_P(\vec{\theta}; \mathcal{P}) = \sum_{n=1}^{9K} \big(R_n(\vec{\theta}) - R_n(\vec{\theta}^*)\big) \mathbf{P}_n \in \mathbb{R}^{3N}
+\end{equation}
+
+dove $R_n(\theta), \, R_n(\vec{\theta}^*) \in \mathbb{R}$ indicano rispettivamente l'$n$-esimo scalare estratto dal vettore di rotazione concatenato $R(\theta)$ e l'$n$-esimo scalare corrispondente alla posa neutra di riferimento $\vec{\theta}^*$;
+$\mathbf{P}_n \in \mathbb{R}^{3N}$ è l'$n$-esimo vettore colonna di spostamento dei vertici, contenente gli offset cartesiani tridimensionali associati a ciascuno degli $N$ vertici della mesh ($3 \times N$ elementi);
+$\mathcal{P} = \begin{bmatrix} \mathbf{P}_1, \mathbf{P}_2, \dots, \mathbf{P}_{9K} \end{bmatrix} \in \mathbb{R}^{3N \times 9K}$ è la matrice statica delle deformazioni di posa apprese dal modello.
+
+
+\paragraph{Posizione delle articolazioni}
+
+La variazione delle proporzioni anatomiche tra individui diversi determina inevitabilmente una differente collocazione spaziale delle articolazioni interne.
+Ciascun giunto articolare è rappresentato dalle proprie coordinate cartesiane tridimensionali nella posa di riposo e, la stima accurata di tali posizioni costituisce un requisito critico per l'integrità geometrica del modello.
+L'errata localizzazione dei centri di rotazione comporterebbe infatti la produzione di artefatti estetici poco realistici durante l'applicazione delle trasformazioni di blend skinning.
+Per questa ragione le articolazioni vengono definite come funzione della forma del corpo $\beta$:
+
+\begin{equation}
+    \mathbf{J}(\vec{\beta}; \mathcal{J}, \bar{\mathbf{T}}, \mathcal{S}) = \mathcal{J} \big( \bar{\mathbf{T}} + B_S(\vec{\beta}; \mathcal{S}) \big)
+\end{equation}
+
+dove $\mathcal{J} \in \mathbb{R}^{3K \times 3N}$ è la matrice di regressione lineare che codifica quali vertici sono più significativi per inferire la posizione delle articolazioni;
+è appresa durante la fase di addestramento.
+$\bar{\mathbf{T}} + B_S(\vec{\beta}; \mathcal{S}) \in \mathbb{R}^{3N}$ è il vettore colonna contenente le coordinate tridimensionali degli $N$ vertici della mesh nella configurazione di riposo, già adattata alla specifica corporatura del soggetto mediante le shape blend shapes.
 
 
 \subsection{MANO}
